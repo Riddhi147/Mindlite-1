@@ -6,3 +6,7 @@ pydantic
 passlib[bcrypt]
 python-jose
 mysql-connector-python
+joblib
+scikit-learn
+pandas
+numpy

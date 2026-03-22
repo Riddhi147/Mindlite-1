@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Gamepad2, Heart,  TrendingUp, Calendar, ArrowRight, Brain, Clock, Target, Trophy } from "lucide-react"
-import { ProgressChart } from "@/components/progress-chart"
+// import { ProgressChart } from "@/components/progress-chart"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
 
@@ -163,22 +163,8 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Progress chart */}
-        <div className="lg:col-span-2 p-6 bg-card rounded-2xl border border-border">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-foreground">Progress Over Time</h2>
-            <Link
-              href="/dashboard/progress"
-              className="text-sm text-primary hover:underline flex items-center gap-1"
-            >
-              View details
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-          <ProgressChart scores={scores} loading={loading} />
-        </div>
-
+      {/* <div className="grid grid-cols-1 lg:grid-cols-3 gap-6"> */}
+      <div className="max-w-md">
         {/* Quick actions */}
         <div className="p-6 bg-card rounded-2xl border border-border">
           <h2 className="text-xl font-semibold text-foreground mb-6">Quick Play</h2>

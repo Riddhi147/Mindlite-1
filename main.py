@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi import UploadFile, File, Form
 import shutil
 import os
-
+from src.api.ml_routes import router
 from src.database import SessionLocal, engine, Base
 from src import crud
 from src import schemas
@@ -17,6 +17,7 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app = FastAPI()
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 Base.metadata.create_all(bind=engine)
+app.include_router(router)
 
 app.add_middleware(
     CORSMiddleware,

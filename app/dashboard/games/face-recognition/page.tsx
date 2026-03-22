@@ -177,7 +177,9 @@ export default function FaceRecognitionGame() {
     )
   }
 
-  const question = questions[currentIndex]
+const question = questions[currentIndex]
+
+if (!question) return null 
 
   return (
     <div className="max-w-lg mx-auto">

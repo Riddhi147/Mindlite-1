@@ -43,5 +43,37 @@ class DoctorPatient(Base):
     id = Column(Integer, primary_key=True, index=True)
     doctor_id = Column(Integer, ForeignKey("users.id"))
     patient_id = Column(Integer, ForeignKey("users.id"))
-
     __table_args__ = (UniqueConstraint("doctor_id", "patient_id", name="uq_doctor_patient"),)
+
+
+class PatientCaregiver(Base):
+    __tablename__ = "patient_caregivers"
+
+    id = Column(Integer, primary_key=True, index=True)
+    patient_id = Column(Integer, ForeignKey("users.id"))
+    name = Column(String(100))
+    email = Column(String(100))
+
+class MLPredictionData(Base):
+    __tablename__ = "ml_predictions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    cognitive_score = Column(Float)
+    risk = Column(String(50))
+    timestamp = Column(String(100))  # ISO string from frontend
+    inputs_json = Column(String(500))  # JSON string of the 5 game inputs
+
+
+class DeclineAlertData(Base):
+    __tablename__ = "decline_alerts"
+
+    id = Column(Integer, primary_key=True, index=True)
+    alert_id = Column(String(100))
+    user_id = Column(Integer, ForeignKey("users.id"))
+    type = Column(String(50))
+    message = Column(String(500))
+    drop_amount = Column(Float)
+    current_score = Column(Float)
+    timestamp = Column(String(100))
+    dismissed = Column(Integer, default=0)

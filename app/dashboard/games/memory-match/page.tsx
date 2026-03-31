@@ -2,9 +2,8 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { ArrowLeft, RotateCcw, Trophy, Clock } from "lucide-react"
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
+import { ArrowLeft, RotateCcw, Trophy, Clock, CheckCircle } from "lucide-react"
+import { gameCompleted } from "@/lib/game-store"
 
 
 ///////////////////////// change symbols here
@@ -26,7 +25,7 @@ export default function MemoryMatchGame() {
   const [gameOver, setGameOver] = useState(false)
   const [time, setTime] = useState(0)
   const [score, setScore] = useState(0)
-  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
 
   const initializeGame = () => {
     const gameSymbols = [...symbols, ...symbols]
@@ -67,6 +66,13 @@ export default function MemoryMatchGame() {
       setGameOver(true)
       const calculatedScore = Math.max(0, 100 - moves * 2 - Math.floor(time / 5))
       setScore(calculatedScore)
+
+      // Auto-save + auto-predict
+      const storedUser = localStorage.getItem("user")
+      if (storedUser) {
+        const { email } = JSON.parse(storedUser)
+        gameCompleted(email, "memory-match", calculatedScore).then(() => setSaved(true))
+      }
     }
   }, [matches, moves, time])
 
@@ -113,28 +119,7 @@ export default function MemoryMatchGame() {
     }
   }
 
-  const saveScore = async () => {
-    setSaving(true)
-    const storedUser = localStorage.getItem("user")
-    if (!storedUser) return
-
-    const parsedUser = JSON.parse(storedUser)
-    try {
-      await fetch(`${API_URL}/score`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          user_id: parsedUser.user_id,
-          game: "memory-match",
-          score,
-        }),
-      })
-    } catch (error) {
-      console.error("Failed to save score:", error)
-    } finally {
-      setSaving(false)
-    }
-  }
+  // Score is auto-saved on game completion
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60)
@@ -216,17 +201,17 @@ export default function MemoryMatchGame() {
             <p className="text-4xl font-bold text-primary">{score}</p>
           </div>
 
+          {saved && (
+            <div className="flex items-center justify-center gap-2 text-emerald-500 mb-4 text-sm font-medium">
+              <CheckCircle className="w-4 h-4" />
+              Score saved & AI prediction updated
+            </div>
+          )}
+
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <button
-              onClick={saveScore}
-              disabled={saving}
-              className="w-full sm:w-auto px-6 py-3 bg-primary text-primary-foreground rounded-xl font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50"
-            >
-              {saving ? "Saving..." : "Save Score"}
-            </button>
-            <button
               onClick={initializeGame}
-              className="w-full sm:w-auto px-6 py-3 border border-border rounded-xl font-semibold hover:bg-muted transition-colors"
+              className="w-full sm:w-auto px-6 py-3 bg-primary text-primary-foreground rounded-xl font-semibold hover:bg-primary/90 transition-colors"
             >
               Play Again
             </button>

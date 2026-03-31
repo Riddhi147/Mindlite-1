@@ -2,9 +2,8 @@
 
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
-import { ArrowLeft, RotateCcw, Trophy, Zap } from "lucide-react"
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
+import { ArrowLeft, RotateCcw, Trophy, Zap, CheckCircle } from "lucide-react"
+import { gameCompleted } from "@/lib/game-store"
 const TOTAL_ROUNDS = 5
 const MIN_DELAY = 1500 // ms before green
 const MAX_DELAY = 4000
@@ -17,6 +16,7 @@ export default function ReactionGame() {
   const [times, setTimes] = useState<number[]>([])
   const [currentTime, setCurrentTime] = useState<number | null>(null)
   const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
 
   const startRef = useRef<number>(0)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
@@ -85,16 +85,11 @@ export default function ReactionGame() {
     try {
       const storedUser = localStorage.getItem("user")
       if (!storedUser) return
-      const { user_id } = JSON.parse(storedUser)
+      const { email } = JSON.parse(storedUser)
       const avg = allTimes.reduce((a, b) => a + b, 0) / allTimes.length
-      // Score: lower reaction time = higher score (cap at 100, floor at 0)
-      // 200ms = 100, 1000ms = 0
       const score = Math.max(0, Math.min(100, Math.round(((1000 - avg) / 800) * 100)))
-      await fetch(`${API_URL}/score`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_id, game: "reaction", score }),
-      })
+      await gameCompleted(email, "reaction", score)
+      setSaved(true)
     } catch (e) {
       console.error("Failed to save score", e)
     } finally {
@@ -174,6 +169,12 @@ export default function ReactionGame() {
         </div>
 
         {saving && <p className="text-sm text-muted-foreground mb-4">Saving score...</p>}
+        {saved && (
+          <div className="flex items-center justify-center gap-2 text-emerald-500 mb-4 text-sm font-medium">
+            <CheckCircle className="w-4 h-4" />
+            Score saved & AI prediction updated
+          </div>
+        )}
 
         <div className="flex gap-3 justify-center">
           <button

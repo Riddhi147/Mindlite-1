@@ -5,14 +5,14 @@ import mysql.connector
 DB_CONFIG = {
     "host": "localhost",
     "user": "root",
-    "password": "admin",
+    "password": "Trishabh@1",
     "database": "mindlite"
 }
 
 def get_conn():
     return mysql.connector.connect(**DB_CONFIG)
 
-DATABASE_URL = "mysql+pymysql://root:admin@localhost/mindlite"
+DATABASE_URL = "mysql+pymysql://root:Trishabh%401@localhost/mindlite"
 
 engine = create_engine(DATABASE_URL)
 

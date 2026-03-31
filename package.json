@@ -15,7 +15,7 @@
     "joblib": "^10.1.1",
     "lucide-react": "^0.469.0",
     "next": "^15.3.0",
-    "passlib": "^0.3.0",
+    "passlib": "^0.2.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "recharts": "^2.15.0",

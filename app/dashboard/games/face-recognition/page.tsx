@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { ArrowLeft, RotateCcw, Trophy, Heart } from "lucide-react"
+import { ArrowLeft, RotateCcw, Trophy, Heart, CheckCircle } from "lucide-react"
+import { gameCompleted } from "@/lib/game-store"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
 
@@ -46,6 +47,7 @@ export default function FaceRecognitionGame() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user")
@@ -93,13 +95,11 @@ export default function FaceRecognitionGame() {
     try {
       const storedUser = localStorage.getItem("user")
       if (!storedUser) return
-      const { user_id } = JSON.parse(storedUser)
+      const { email } = JSON.parse(storedUser)
       const pct = Math.round((finalScore / questions.length) * 100)
-      await fetch(`${API_URL}/score`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_id, game: "face-recognition", score: pct }),
-      })
+      // Auto-save via game-store (handles local + backend + ML predict)
+      await gameCompleted(email, "face-recognition", pct)
+      setSaved(true)
     } catch (e) {
       console.error("Failed to save score", e)
     } finally {
@@ -157,6 +157,12 @@ export default function FaceRecognitionGame() {
         </div>
 
         {saving && <p className="text-sm text-muted-foreground mb-4">Saving score...</p>}
+        {saved && (
+          <div className="flex items-center justify-center gap-2 text-emerald-500 mb-4 text-sm font-medium">
+            <CheckCircle className="w-4 h-4" />
+            Score saved & AI prediction updated
+          </div>
+        )}
 
         <div className="flex gap-3 justify-center">
           <button

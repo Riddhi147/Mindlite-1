@@ -2,9 +2,8 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { ArrowLeft, RotateCcw, Trophy, Play, Check, X } from "lucide-react"
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
+import { ArrowLeft, RotateCcw, Trophy, Play, Check, X, CheckCircle } from "lucide-react"
+import { gameCompleted } from "@/lib/game-store"
 
 const wordLists = [
   ["apple", "house", "river", "chair", "phone", "garden", "coffee", "window"],
@@ -21,7 +20,7 @@ export default function WordRecallGame() {
   const [recalledWords, setRecalledWords] = useState<string[]>([])
   const [timeLeft, setTimeLeft] = useState(30)
   const [score, setScore] = useState(0)
-  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
 
   const startGame = () => {
     const randomList = wordLists[Math.floor(Math.random() * wordLists.length)]
@@ -73,30 +72,16 @@ export default function WordRecallGame() {
     const calculatedScore = Math.round((correctWords.length / words.length) * 100)
     setScore(calculatedScore)
     setGameState("results")
-  }
 
-  const saveScore = async () => {
-    setSaving(true)
+    // Auto-save + auto-predict
     const storedUser = localStorage.getItem("user")
-    if (!storedUser) return
-
-    const parsedUser = JSON.parse(storedUser)
-    try {
-      await fetch(`${API_URL}/score`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          user_id: parsedUser.user_id,
-          game: "word-recall",
-          score,
-        }),
-      })
-    } catch (error) {
-      console.error("Failed to save score:", error)
-    } finally {
-      setSaving(false)
+    if (storedUser) {
+      const { email } = JSON.parse(storedUser)
+      gameCompleted(email, "word-recall", calculatedScore).then(() => setSaved(true))
     }
   }
+
+  // Score is auto-saved on game completion
 
   const getCorrectWords = () => {
     return recalledWords.filter((w) =>
@@ -266,17 +251,17 @@ export default function WordRecallGame() {
               </div>
             </div>
 
+            {saved && (
+              <div className="flex items-center justify-center gap-2 text-emerald-500 mb-4 text-sm font-medium">
+                <CheckCircle className="w-4 h-4" />
+                Score saved & AI prediction updated
+              </div>
+            )}
+
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <button
-                onClick={saveScore}
-                disabled={saving}
-                className="w-full sm:w-auto px-6 py-3 bg-primary text-primary-foreground rounded-xl font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50"
-              >
-                {saving ? "Saving..." : "Save Score"}
-              </button>
-              <button
                 onClick={startGame}
-                className="w-full sm:w-auto px-6 py-3 border border-border rounded-xl font-semibold hover:bg-muted transition-colors"
+                className="w-full sm:w-auto px-6 py-3 bg-primary text-primary-foreground rounded-xl font-semibold hover:bg-primary/90 transition-colors"
               >
                 Play Again
               </button>

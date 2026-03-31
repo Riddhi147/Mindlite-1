@@ -3,19 +3,21 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { Brain, Home, Gamepad2, LineChart, Users, Settings, LogOut, Menu, X, ChevronRight } from "lucide-react"
+import { Brain, Home, Gamepad2, LineChart, Users, Settings, LogOut, Menu, X, ChevronRight, Calculator, HeartPulse } from "lucide-react"
 
 const patientNavigation = [
   { name: "Overview", href: "/dashboard", icon: Home },
   { name: "Games", href: "/dashboard/games", icon: Gamepad2 },
+  { name: "Progress", href: "/dashboard/progress", icon: LineChart },
   { name: "Family", href: "/dashboard/family", icon: Users },
+  { name: "Caregivers", href: "/dashboard/caregivers", icon: HeartPulse },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ]
 
 const caregiverNavigation = [
   { name: "Overview", href: "/dashboard", icon: Home },
   { name: "Manage Patients", href: "/dashboard/patients", icon: Users },
-  { name: "Progress", href: "/dashboard/progress", icon: LineChart },
+  { name: "Score Calculator", href: "/dashboard/calculator", icon: Calculator },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ]
 
